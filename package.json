@@ -1,0 +1,30 @@
+{
+  "name": "pijin",
+  "version": "0.1.0",
+  "description": "A Sane HTTP API Test Runner",
+  "main": "lib/index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TomLingham/Pijin.git"
+  },
+  "author": "",
+  "bugs": {
+    "url": "https://github.com/TomLingham/Pijin/issues"
+  },
+  "homepage": "https://github.com/TomLingham/Pijin#readme",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "npm": "^5.3.0",
+    "package-json": "^4.0.1",
+    "yargs": "^8.0.2"
+  },
+  "bin": {
+    "pijin": "./lib/cli.js"
+  }
+}
