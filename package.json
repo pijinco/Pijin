@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/TomLingham/Pijin#readme",
   "dependencies": {
+    "find-up": "^2.1.0",
     "lodash": "^4.17.4",
     "npm": "^5.3.0",
     "package-json": "^4.0.1",
