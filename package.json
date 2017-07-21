@@ -7,7 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"lib/**/*.js\"",
+    "lint:fix": "eslint --fix \"lib/**/*.js\""
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,9 @@
     "url": "https://github.com/TomLingham/Pijin/issues"
   },
   "homepage": "https://github.com/TomLingham/Pijin#readme",
+  "bin": {
+    "pijin": "./lib/cli.js"
+  },
   "dependencies": {
     "find-up": "^2.1.0",
     "lodash": "^4.17.4",
@@ -25,7 +30,13 @@
     "package-json": "^4.0.1",
     "yargs": "^8.0.2"
   },
-  "bin": {
-    "pijin": "./lib/cli.js"
+  "devDependencies": {
+    "eslint": "^4.2.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsdoc": "^3.1.1",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
   }
 }
