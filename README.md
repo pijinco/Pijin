@@ -1,4 +1,4 @@
-![Pijin Logo](https://tomlingham.github.io/Pijin/assets/img/pijin-logo.svg)
+![Pijin Logo](https://pijinco.github.io/Pijin/assets/img/pijin-logo.svg)
 
 
 ## Introduction
