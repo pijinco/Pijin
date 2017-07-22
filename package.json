@@ -13,13 +13,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TomLingham/Pijin.git"
+    "url": "git+https://github.com/pijinco/Pijin.git"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/TomLingham/Pijin/issues"
+    "url": "https://github.com/pijinco/Pijin/issues"
   },
-  "homepage": "https://github.com/TomLingham/Pijin#readme",
+  "homepage": "https://github.com/pijinco/Pijin#readme",
   "bin": {
     "pijin": "./lib/cli.js"
   },
