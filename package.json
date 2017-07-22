@@ -1,6 +1,6 @@
 {
   "name": "pijin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Sane HTTP API Test Runner",
   "main": "lib/index.js",
   "directories": {
