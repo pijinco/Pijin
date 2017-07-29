@@ -7,21 +7,22 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "ava '**/__test__/*.test.js'",
+    "flow": "flow",
     "lint": "eslint './lib/**/*.js'",
-    "lint:fix": "eslint --fix './lib/**/*.js'"
+    "lint:fix": "eslint --fix './lib/**/*.js'",
+    "test": "ava '**/__test__/*.test.js'"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pijinco/Pijin.git"
   },
-  "author": "",
+  "author": "Pijin Co. <tjlingham@gmail.com>",
   "bugs": {
     "url": "https://github.com/pijinco/Pijin/issues"
   },
   "homepage": "https://github.com/pijinco/Pijin#readme",
   "bin": {
-    "pijin": "./lib/cli.js"
+    "pijin": "./src/cli.js"
   },
   "dependencies": {
     "find-up": "^2.1.0",
@@ -32,6 +33,8 @@
   },
   "devDependencies": {
     "ava": "^0.21.0",
+    "babel-cli": "^6.24.1",
+    "babel-preset-flow": "^6.23.0",
     "eslint": "^4.2.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
@@ -39,6 +42,7 @@
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "flow-bin": "^0.51.1",
     "sinon": "^2.3.8"
   }
 }
