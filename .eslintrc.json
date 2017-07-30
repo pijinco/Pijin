@@ -1,10 +1,18 @@
 {
-  "extends": "standard",
-  "plugins": [ "jsdoc" ],
+  "extends": [
+    "standard",
+    "plugin:flowtype/recommended"
+  ],
+  "parser": "babel-eslint",
+  "plugins": [
+    "jsdoc",
+    "flowtype"
+  ],
   "rules": {
     "comma-dangle": ["error", {
       "arrays": "always-multiline",
       "objects": "always-multiline",
+      "imports": "always-multiline",
       "functions": "never"
     }],
     "no-multiple-empty-lines": ["error", {
@@ -17,9 +25,7 @@
     "jsdoc/newline-after-description": 1,
     "jsdoc/require-hyphen-before-param-description": 1,
     "jsdoc/require-param": 1,
-    "jsdoc/require-param-description": 1,
     "jsdoc/require-param-type": 1,
-    "jsdoc/require-returns-description": 1,
     "jsdoc/require-returns-type": 1
   }
 }
