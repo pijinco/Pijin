@@ -1,6 +1,4 @@
-'use strict'
-
-const throwable = require('./throwable')
+import throwable from './throwable'
 
 
 /**
@@ -8,25 +6,28 @@ const throwable = require('./throwable')
  *
  * @returns {undefined}
  */
-function ConfigurationExpiredException () {
-  return {
-    message: 'The Configuration Object buffer has already been written to file.',
+export const ConfigurationExpiredException = throwable(
+  function ConfigurationExpiredException () {
+    return {
+      message: 'The Configuration Object buffer has already been written to file.',
+    }
   }
-}
+)
 
 
 /**
  * FileNotFoundException
  *
  * @param fileIdentifier
- * @returns {undefined}
+ * @returns {Object}
  */
-function FileNotFoundException (fileIdentifier) {
-  return {
-    message: `File ${fileIdentifier} does not exist.`,
+export const FileNotFoundException = throwable(
+  function FileNotFoundException (fileIdentifier) {
+    return {
+      message: `File ${fileIdentifier} does not exist.`,
+    }
   }
-}
-
+)
 
 /**
  * FileExistsException
@@ -34,22 +35,11 @@ function FileNotFoundException (fileIdentifier) {
  * @param fileIdentifier
  * @returns {undefined}
  */
-function FileExistsException (fileIdentifier) {
-  return {
-    message: `Path ${fileIdentifier} already exists.`,
+export const FileExistsException = throwable(
+  function FileExistsException (fileIdentifier) {
+    return {
+      message: `Path ${fileIdentifier} already exists.`,
+    }
   }
-}
+)
 
-
-const exceptions = [
-  FileNotFoundException,
-  ConfigurationExpiredException,
-  FileExistsException,
-]
-
-
-module.exports = exceptions
-  .reduce((exports, exception) => {
-    exports[exception.name] = throwable(exception)
-    return exports
-  }, {})

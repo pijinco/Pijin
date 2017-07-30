@@ -1,12 +1,12 @@
 'use strict'
 
-const test = require('ava')
-const sinon = require('sinon')
-const Configurator = require('../conf')
+import test from 'ava'
+import sinon from 'sinon'
+import ConfiguratorFactory from '../conf'
 
 const mockConfigPath = 'path/to/config.json'
 
-const mockFsConfig = () => ({
+const mockDeps = () => ({
   fs: {
     mkdir: async x => x,
     readFile: async x => '{}',
@@ -29,8 +29,8 @@ const mockConfigFile = {
 
 
 test.beforeEach(t => {
-  t.context.mock = mockFsConfig()
-  t.context.conf = Configurator(t.context.mock)
+  t.context.mock = mockDeps()
+  t.context.conf = ConfiguratorFactory(t.context.mock)
 })
 
 

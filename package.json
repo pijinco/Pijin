@@ -7,10 +7,12 @@
     "doc": "docs"
   },
   "scripts": {
+    "build": "rimraf lib && babel src --out-dir lib --source-maps inline",
     "flow": "flow",
     "lint": "eslint './lib/**/*.js'",
     "lint:fix": "eslint --fix './lib/**/*.js'",
-    "test": "ava '**/__test__/*.test.js'"
+    "test": "ava 'lib/**/__test__/*.test.js'",
+    "watch": "npm run -s build -- --watch"
   },
   "repository": {
     "type": "git",
@@ -22,7 +24,7 @@
   },
   "homepage": "https://github.com/pijinco/Pijin#readme",
   "bin": {
-    "pijin": "./src/cli.js"
+    "pijin": "./lib/cli.js"
   },
   "dependencies": {
     "find-up": "^2.1.0",
@@ -34,15 +36,26 @@
   "devDependencies": {
     "ava": "^0.21.0",
     "babel-cli": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-env": "^1.6.0",
     "babel-preset-flow": "^6.23.0",
+    "babel-register": "^6.24.1",
     "eslint": "^4.2.0",
     "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-flowtype": "^2.35.0",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-jsdoc": "^3.1.1",
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.51.1",
+    "rimraf": "^2.6.1",
     "sinon": "^2.3.8"
+  },
+  "ava": {
+    "require": [
+      "babel-core/register"
+    ]
   }
 }

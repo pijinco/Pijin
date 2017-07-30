@@ -1,44 +1,40 @@
-'use strict'
+// @flow
 
-const R = require('ramda')
-const npmFetch = require('package-json')
+import npmFetch from 'package-json'
 
-const Npm = require('./npm')
+import Npm from './npm'
 
-const npmConfig = { loglevel: 'silent' }
-const getInstallablePackageName = ({ name, version }) => `${name}@${version}`
-
-
-const defaultDependencies = {
-  npm: Npm(),
-  npmFetch,
+export type NpmPackage = {
+  name: string,
+  version: string,
 }
 
-module.exports = function PackageManager ({ npm, npmFetch } = defaultDependencies) {
-  /**
-   * Install packages
-   *
-   * @returns {undefined}
-   */
-  const installPackages = R.pipe(
-    R.map(getInstallablePackageName),
-    R.apply(npm.install)
-  )
+const npmConfig = { loglevel: 'silent' }
 
+const getInstallablePackageName = ({ name, version }: NpmPackage) => `${name}@${version}`
+
+
+class PackageManager {
+  npm: Npm
+  npmFetch: Function
+
+  constructor (npm: Npm, npmFetch: Function) {
+    this.npm = npm
+    this.npmFetch = npmFetch
+  }
 
   /**
    * Install NPM packages.
-   *
-   * @param {string[]} packages - An array of package names to install
-   * @returns {Promise.<Object[]>} The array of npm package details
    */
-  async function install (packages) {
+  async install (packages: string[]) {
     try {
-      await npm.load(npmConfig)
+      await this.npm.load(npmConfig)
 
       const packageDetails = await Promise.all(packages.map(npmFetch))
 
-      await installPackages(packageDetails)
+      await this.npm.install(
+        ...packageDetails.map(getInstallablePackageName)
+      )
 
       return packageDetails
     } catch (error) {
@@ -46,11 +42,17 @@ module.exports = function PackageManager ({ npm, npmFetch } = defaultDependencie
       throw error
     }
   }
-
-
-  return {
-    getInstallablePackageName,
-    install,
-    installPackages,
-  }
 }
+
+
+const D: {
+  npm: Npm,
+  npmFetch: Function,
+} = {
+  npm: Npm(),
+  npmFetch,
+}
+
+
+export default ({ npm, npmFetch }: * = D) =>
+  new PackageManager(npm, npmFetch)

@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 'use strict'
 
-const yargs = require('yargs')
-
-const Conf = require('./conf')
-const Init = require('./init')
-const Pack = require('./package')
+import yargs from 'yargs'
+import Conf from './conf'
+import Init from './init'
+import Pack from './package'
 
 const conf = Conf()
 const init = Init()

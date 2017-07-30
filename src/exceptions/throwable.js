@@ -1,6 +1,3 @@
-'use strict'
-
-
 /**
  * Decorate the object returned by the exception function.
  *
@@ -8,7 +5,7 @@
  * @param name
  * @returns {undefined}
  */
-module.exports = function ThrowableFactory (exception) {
+export default function ThrowableFactory (exception) {
   const name = exception.name
 
   function throwable (...args) {

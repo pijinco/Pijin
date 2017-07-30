@@ -1,7 +1,9 @@
-'use strict'
+// @flow
 
-const path = require('path')
-const Conf = require('./conf')
+import path from 'path'
+import ConfigurationBuilderFactory, {
+  type ConfigurationBuilder,
+} from './conf'
 
 const {
   FileExistsException,
@@ -11,21 +13,26 @@ const configFileName = 'pijin.json'
 const workDirName = 'pijin'
 
 
-const defaultDependencies = {
-  conf: Conf(),
-  path,
+type Path = {
+  resolve: (...args: string[]) => string,
 }
 
-module.exports = function Init ({ conf, path } = defaultDependencies) {
+
+class Pijin {
+  conf: ConfigurationBuilder
+  path: Path
+
+  constructor (conf: ConfigurationBuilder, path: Path) {
+    this.conf = conf
+    this.path = path
+  }
+
   /**
    * Initialize Pijin in the given directory with the passed default configuration.
-   *
-   * @param {string} dir - The directory where Pijin should be initialized.
-   * @returns {Promise.<string[]>} a promise that returns and object with the path to the config file and the working directory.
    */
-  async function initialize (dir) {
+  async initialize (dir: string): Promise<mixed> {
     try {
-      await createWorkspace(dir)
+      await this.createWorkspace(dir)
       console.log('Pijin initilized :)')
     } catch (error) {
       if (error.is(FileExistsException)) {
@@ -36,39 +43,35 @@ module.exports = function Init ({ conf, path } = defaultDependencies) {
     }
   }
 
-
   /**
-   * createWorkspace
-   *
-   * @param {Object} config - The configuruation object to serialize into the config file.
-   * @param {string} filename - The filename of the Pijin (only pijin.json default is supported).
-   * @param {string} dirname - The name of the Work Directiry (only pijin default is supported).
-   * @returns {undefined}
+   * Create the workspace for Pijin in the specified directory with the
+   * specified filename for the config file and directory name for the project.
    */
-  async function createWorkspace (dir, filename = configFileName, dirname = workDirName) {
-    const configFilePath = path.resolve(dir, filename)
-    const workDirPath = path.resolve(dir, workDirName)
+  async createWorkspace (dir: string, filename: string = configFileName, dirname: string = workDirName) {
+    const configFilePath = this.path.resolve(dir, filename)
+    const workDirPath = this.path.resolve(dir, workDirName)
 
-    try {
-      await Promise.all([
-        conf.writeConfigFile(configFilePath),
-        conf.createWorkingDirectory(workDirPath),
-      ])
+    await Promise.all([
+      this.conf.writeConfigFile(configFilePath),
+      this.conf.createWorkingDirectory(workDirPath),
+    ])
 
-      return {
-        configFilePath,
-        workDirPath,
-      }
-    } catch (error) {
-      // TODO log this
-      throw error
+    return {
+      configFilePath,
+      workDirPath,
     }
-  }
-
-
-  return {
-    initialize,
-    createWorkspace,
   }
 }
 
+
+const D: {
+  conf: ConfigurationBuilder,
+  path: Path,
+} = {
+  conf: ConfigurationBuilderFactory(),
+  path,
+}
+
+
+export default ({ conf, path }: * = D) =>
+  new Pijin(conf, path)

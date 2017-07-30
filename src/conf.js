@@ -1,33 +1,40 @@
-'use strict'
+// @flow
 
-const fs = require('./io/file')
-const findUp = require('find-up')
+import findUp, { type FindUp } from 'find-up'
+import fs, { type FileSystem } from './io/file'
+import { type NpmPackage } from './package'
 
-const {
+import {
   ConfigurationExpiredException,
   FileNotFoundException,
-} = require('./exceptions')
+} from './exceptions'
 
-const defaultDependencies = {
-  fs,
-  findUp,
+
+export type PijinConfig = {
+  dependencies: Object,
+  workdir?: string,
 }
 
 
-module.exports = function Configurator ({ fs, findUp } = defaultDependencies) {
-  const defaultConfig = {
-    // Config goes here
-    dependencies: {},
+const defaultConfig: PijinConfig = {
+  dependencies: {},
+}
+
+
+export class ConfigurationBuilder {
+  fs: FileSystem
+  findUp: FindUp
+
+  constructor (fs: FileSystem, findUp: FindUp) {
+    this.fs = fs
+    this.findUp = findUp
   }
 
-
   /**
-   * Add the dependecies that are passed in to the configuration file under the dependencies key.
-   *
-   * @param {object[]} dependencies - an array of dependencies to install
-   * @returns {Promise.<object>} a promise that resolves the updated configuration
+   * Add the dependecies that are passed in to the configuration file under the
+   * dependencies key.
    */
-  async function updateDependencies (dependencies) {
+  async updateDependencies (dependencies: NpmPackage[]) {
     // Load a list of dependencies similar to how npm does it by default with
     // the caret to only lock the major
     const deps = dependencies
@@ -35,7 +42,7 @@ module.exports = function Configurator ({ fs, findUp } = defaultDependencies) {
       .reduce((acc, next) => Object.assign(acc, next))
 
     // Load the configuration and write
-    const { config, write } = await loadConfig()
+    const { config, write } = await this.loadConfig()
 
     config.dependencies = Object.assign(config.dependencies || {}, deps)
 
@@ -45,12 +52,8 @@ module.exports = function Configurator ({ fs, findUp } = defaultDependencies) {
 
   /**
    * Create the Pijin configuation and write to file.
-   *
-   * @param {string} path - The path of the pijin file
-   * @param {Object} config - The configuration object to marge with defaults
-   * @returns {Promise.<Object>} returns a promise that resolves the next configuration
    */
-  async function writeConfigFile (path, config = {}) {
+  async writeConfigFile (path: string, config: PijinConfig = defaultConfig) {
     const nextConfig = Object.assign({}, defaultConfig, config)
 
     const configFileContent = JSON.stringify(
@@ -59,75 +62,69 @@ module.exports = function Configurator ({ fs, findUp } = defaultDependencies) {
       2
     )
 
-    await fs.writeFile(path, configFileContent)
+    await this.fs.writeFile(path, configFileContent)
 
     return nextConfig
   }
 
 
   /**
-   * Create the working directory for Pijin. This folder is where all the test files
-   * and packages will run.
-   *
-   * @param {string} path - The path of the working directory folder
-   * @returns {Promise.<Object>} the path to the working directory
+   * Create the working directory for Pijin. This folder is where all the test
+   * files and packages will run.
    */
-  function createWorkingDirectory (path) {
+  async createWorkingDirectory (path: string): Promise<string> {
     console.log(`Creating Pijin working directory at ${path}`)
 
-    return fs.mkdir(path)
+    return this.fs.mkdir(path)
   }
 
 
   /**
    * Search up for the config file and if found load the and resolve the config
    * and the path to the config as `{ config, path }`.
-   *
-   * @returns {Promise.<Object>} Returns a promise that resolves the path to config, the config and 3 helper functions
    */
-  async function loadConfig () {
-    const path = await findConfig()
+  async loadConfig (): Promise<{ config: PijinConfig, write: (PijinConfig) => Promise<PijinConfig> }> {
+    const path = await this.findConfig()
 
-    const config = JSON.parse(await fs.readFile(path))
+    const configBuffer = await this.fs.readFile(path)
 
-    // This flag is here to see if we have already written to the config
-    // file. This can be bypassed if absolutely required by calling the
-    // create config file function directly
+    const config: PijinConfig = JSON.parse(configBuffer.toString())
+
+    // This flag is here to see if we have already written to the config file.
+    // This can be bypassed if absolutely required by calling the create config
+    // file function directly
     let configIsDirty = false
 
     return {
       config,
-      path,
-
-      write (newConfig) {
+      write: newConfig => {
         if (configIsDirty) throw ConfigurationExpiredException()
         configIsDirty = true
-        return writeConfigFile(path, newConfig)
+        return this.writeConfigFile(path, newConfig)
       },
     }
   }
 
 
-  /**
-   * findConfig
-   *
-   * @returns {undefined}
-   */
-  async function findConfig () {
+  async findConfig (): Promise<string> {
     const filename = 'pijin.json'
-    const path = await findUp(filename)
+    const path = await this.findUp(filename)
 
     if (!path) throw FileNotFoundException(filename)
 
     return path
   }
-
-
-  return {
-    createWorkingDirectory,
-    findConfig,
-    loadConfig,
-    updateDependencies,
-    writeConfigFile,
-  }
 }
+
+
+const D: {
+  fs: FileSystem,
+  findUp: FindUp,
+} = {
+  fs,
+  findUp,
+}
+
+
+export default ({ fs, findUp }: * = D) =>
+  new ConfigurationBuilder(fs, findUp)
