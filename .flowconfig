@@ -1,7 +1,8 @@
 [ignore]
+.*/node_modules/config-chain/test/broken.json
 
 [include]
-./lib
+./src
 
 [libs]
 
