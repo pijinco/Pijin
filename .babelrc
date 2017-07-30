@@ -1,3 +1,11 @@
 {
-  "presets": ["flow"]
+  "presets": [
+    "flow",
+    ["env", {
+      "targets": {
+        "node": "current"
+      }
+    }]
+  ],
+  "plugins": ["transform-decorators-legacy"]
 }
