@@ -20,8 +20,9 @@ yargs
     command: 'install <packages...>',
     aliases: ['i'],
     desc: 'Install dependencies used in the pre and post tests',
-    handler: ({ packages }) => pack.install(packages)
-      .then(conf.updateDependencies)
+    handler: ({ packages }) => conf.findConfig()
+      .then(() => pack.install(packages))
+      .then(packages => conf.updateDependencies(packages))
       .catch(console.error),
   })
 
