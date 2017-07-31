@@ -1,6 +1,3 @@
-#!/usr/bin/env node
-'use strict'
-
 import yargs from 'yargs'
 import Conf from './conf'
 import Init from './init'

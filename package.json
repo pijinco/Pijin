@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/pijinco/Pijin#readme",
   "bin": {
-    "pijin": "./lib/cli.js"
+    "pijin": "./bin/pijin"
   },
   "dependencies": {
     "find-up": "^2.1.0",
