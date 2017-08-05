@@ -1,6 +1,5 @@
 // @flow
 
-import 'babel-polyfill'
 import yargs from 'yargs'
 
 import Conf from './conf'
