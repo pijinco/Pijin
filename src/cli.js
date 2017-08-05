@@ -1,11 +1,15 @@
+// @flow
+
 import yargs from 'yargs'
+
 import Conf from './conf'
-import Init from './init'
 import Pack from './package'
 
-const conf = Conf()
-const init = Init()
-const pack = Pack()
+import Pijin from './pijin'
+
+const pijin = Pijin.new()
+const conf = Conf.new()
+const pack = Pack.new()
 
 
 /**
@@ -24,6 +28,19 @@ yargs
 
 
 /**
+ * Install dependencies used in the pre and post test scripts
+ */
+yargs
+  .command({
+    command: 'run',
+    desc: 'Run the API tests',
+    handler: () => conf.loadConfig()
+      .then(({ config }) => pijin.run(config))
+      .catch(console.error),
+  })
+
+
+/**
  * Initialize Pijin in the current directory.
  * Creates a `pijin.json` file in the current directory.
  */
@@ -31,7 +48,7 @@ yargs
   .command({
     command: 'init',
     desc: 'Initialize Pijin in the current directory',
-    handler: () => init.initialize(process.cwd())
+    handler: () => pijin.initialize(process.cwd())
       .catch(console.error),
   })
 

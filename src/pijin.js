@@ -1,9 +1,8 @@
 // @flow
 
 import path from 'path'
-import ConfigurationBuilderFactory, {
-  type ConfigurationBuilder,
-} from './conf'
+import Conf, { type PijinConfig } from './conf'
+import PackageManager from './package'
 
 const {
   FileExistsException,
@@ -13,17 +12,34 @@ const configFileName = 'pijin.json'
 const workDirName = 'pijin'
 
 
-type Path = {
-  resolve: (...args: string[]) => string,
+type Dependencies = {
+  conf: Conf,
+  pack: PackageManager,
+  path: {
+    resolve: (...string[]) => string,
+  },
 }
 
 
-class Pijin {
-  conf: ConfigurationBuilder
-  path: Path
+export default class Pijin {
+  conf: Conf
+  pack: PackageManager
+  path: { resolve: (...string[]) => string }
 
-  constructor (conf: ConfigurationBuilder, path: Path) {
+
+  static new (dependencies?: Dependencies): Pijin {
+    return new Pijin({
+      conf: Conf.new(),
+      pack: PackageManager.new(),
+      path,
+      ...dependencies,
+    })
+  }
+
+
+  constructor ({ conf, pack, path }: Dependencies) {
     this.conf = conf
+    this.pack = pack
     this.path = path
   }
 
@@ -41,6 +57,14 @@ class Pijin {
         console.error('There was a problem doing the thing :(')
       }
     }
+  }
+
+
+  async run (config: PijinConfig) {
+    const installablePackageNames = Object.keys(config.dependencies)
+      .map(packageName => `${packageName}@${config.dependencies[packageName]}`)
+
+    this.pack.install(installablePackageNames)
   }
 
   /**
@@ -62,16 +86,3 @@ class Pijin {
     }
   }
 }
-
-
-const D: {
-  conf: ConfigurationBuilder,
-  path: Path,
-} = {
-  conf: ConfigurationBuilderFactory(),
-  path,
-}
-
-
-export default ({ conf, path }: * = D) =>
-  new Pijin(conf, path)

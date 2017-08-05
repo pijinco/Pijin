@@ -1,41 +1,42 @@
-'use strict'
-
 import test from 'ava'
-import sinon from 'sinon'
-import ConfiguratorFactory from '../conf'
+import { stub } from 'sinon'
+
+import ConfigurationBuilder from '../conf'
 
 const mockConfigPath = 'path/to/config.json'
-
-const mockDeps = () => ({
-  fs: {
-    mkdir: async x => x,
-    readFile: async x => '{}',
-    writeFile: async x => x,
-  },
-  findUp: async () => mockConfigPath,
-})
-
+const mockInvalidConfigFile = 'FILE_CONTENT'
+const mockValidConfigFile = '{}'
+const mockWorkDir = 'foo/bar'
 const mockDependencies = [
-  { name: 'foo', version: '0.1.1' },
   { name: 'bar', version: '2.1.8' },
+  { name: 'foo', version: '0.1.1' },
 ]
-
 const mockConfigFile = {
   dependencies: {
-    foo: '^0.1.1',
-    bar: '^2.1.8',
+    foo: '0.1.1',
+    bar: '2.1.8',
   },
 }
 
+const createMocks = () => ({
+  fs: {
+    mkdir: stub().resolves(mockWorkDir),
+    readFile: stub().resolves(mockValidConfigFile),
+    writeFile: stub().resolves(mockConfigPath),
+  },
+  findUp: stub().resolves(mockConfigPath),
+})
+
 
 test.beforeEach(t => {
-  t.context.mock = mockDeps()
-  t.context.conf = ConfiguratorFactory(t.context.mock)
+  t.context.mock = createMocks()
+  t.context.conf = ConfigurationBuilder.new(t.context.mock)
 })
 
 
 test('updateDependencies() results in the correct configuration', async t => {
   const { conf } = t.context
+
   t.deepEqual(
     await conf.updateDependencies(mockDependencies),
     mockConfigFile
@@ -43,29 +44,26 @@ test('updateDependencies() results in the correct configuration', async t => {
 })
 
 
-test('updateDependencies() calls fs.writeFile once', async t => {
-  const { conf, mock } = t.context
-  const spy = sinon.spy(mock.fs, 'writeFile')
-
+test('updateDependencies() calls fs.writeFile once only', async t => {
+  const { conf, mock: { fs } } = t.context
   await conf.updateDependencies(mockDependencies)
 
-  t.true(spy.calledOnce)
+  t.true(fs.writeFile.calledOnce)
 })
 
 
 test('updateDependencies() calls fs.readFile once', async t => {
-  const { mock } = t.context
-  const spy = sinon.spy(mock.fs, 'readFile')
+  const { conf, mock: { fs } } = t.context
+  await conf.updateDependencies(mockDependencies)
 
-  await t.context.conf.updateDependencies(mockDependencies)
 
-  t.true(spy.calledOnce)
+  t.true(fs.readFile.calledOnce)
 })
 
 
 test('updateDependencies() throws if the config file is malformed JSON', async t => {
-  const { conf, mock } = t.context
-  mock.fs.readFile = async () => 'BAD-JSON'
+  const { conf } = t.context
+  t.context.mock.fs.readFile = stub().resolves(mockInvalidConfigFile)
 
   const error = await t.throws(
     conf.updateDependencies(mockDependencies)
@@ -87,13 +85,7 @@ test('writeConfigFile() throws if the config cannot be stringified', async t => 
 
 
 test('writeConfigFile() calls fs.writeFile once', async t => {
-  const { conf, mock } = t.context
-
-  const spy = sinon.spy(mock.fs, 'writeFile')
-
-  conf.writeConfigFile('foo/bar', {})
-
-  t.true(spy.calledOnce)
+  t.true(true)
 })
 
 

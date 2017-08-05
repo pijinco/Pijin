@@ -1,58 +1,48 @@
 // @flow
 
-import npmFetch from 'package-json'
-
 import Npm from './npm'
-
-export type NpmPackage = {
-  name: string,
-  version: string,
-}
 
 const npmConfig = { loglevel: 'silent' }
 
-const getInstallablePackageName = ({ name, version }: NpmPackage) => `${name}@${version}`
+const verRegex = new RegExp('^([\\w-]+)(?:@(.+))?$')
 
+export default class PackageManager {
+  npm: *
 
-class PackageManager {
-  npm: Npm
-  npmFetch: Function
-
-  constructor (npm: Npm, npmFetch: Function) {
-    this.npm = npm
-    this.npmFetch = npmFetch
+  static new () {
+    return new PackageManager(Npm.new())
   }
 
-  /**
-   * Install NPM packages.
-   */
+  constructor (npm: Npm) {
+    this.npm = npm
+  }
+
+  parseVersion (packageName: string) {
+    const [, name, version = 'latest'] = packageName.match(verRegex) || []
+
+    return {
+      name,
+      version,
+    }
+  }
+
   async install (packages: string[]) {
     try {
       await this.npm.load(npmConfig)
 
-      const packageDetails = await Promise.all(packages.map(npmFetch))
-
-      await this.npm.install(
-        ...packageDetails.map(getInstallablePackageName)
+      const packageDetails = await Promise.all(
+        packages
+          .map(packageName => this.parseVersion(packageName))
+          .map(({ name, version }) => this.npm.getInfo(name, version))
       )
+
+      await this.npm.install(...packageDetails.map(x => x.name))
 
       return packageDetails
     } catch (error) {
-      // TODO consider handling here
+      // TODO logging
       throw error
     }
   }
 }
 
-
-const D: {
-  npm: Npm,
-  npmFetch: Function,
-} = {
-  npm: Npm(),
-  npmFetch,
-}
-
-
-export default ({ npm, npmFetch }: * = D) =>
-  new PackageManager(npm, npmFetch)

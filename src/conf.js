@@ -2,7 +2,8 @@
 
 import findUp, { type FindUp } from 'find-up'
 import fs, { type FileSystem } from './io/file'
-import { type NpmPackage } from './package'
+import { type NpmPackage } from './package/npm'
+
 
 import {
   ConfigurationExpiredException,
@@ -21,11 +22,25 @@ const defaultConfig: PijinConfig = {
 }
 
 
-export class ConfigurationBuilder {
+type Dependencies = {
+  fs: FileSystem,
+  findUp: typeof findUp,
+}
+
+
+export default class ConfigurationBuilder {
   fs: FileSystem
   findUp: FindUp
 
-  constructor (fs: FileSystem, findUp: FindUp) {
+  static new (dependencies?: Dependencies) {
+    return new ConfigurationBuilder({
+      fs,
+      findUp,
+      ...dependencies,
+    })
+  }
+
+  constructor ({ fs, findUp }: Dependencies) {
     this.fs = fs
     this.findUp = findUp
   }
@@ -38,11 +53,11 @@ export class ConfigurationBuilder {
     // Load a list of dependencies similar to how npm does it by default with
     // the caret to only lock the major
     const deps = dependencies
-      .map(({ name, version }) => ({ [name]: `^${version}` }))
+      .map(({ name, version }) => ({ [name]: `${version}` }))
       .reduce((acc, next) => Object.assign(acc, next))
 
     // Load the configuration and write
-    const { config, write } = await this.loadConfig()
+    const { config, write } = await this.loadConfigMut()
 
     config.dependencies = Object.assign(config.dependencies || {}, deps)
 
@@ -83,12 +98,26 @@ export class ConfigurationBuilder {
    * Search up for the config file and if found load the and resolve the config
    * and the path to the config as `{ config, path }`.
    */
-  async loadConfig (): Promise<{ config: PijinConfig, write: (PijinConfig) => Promise<PijinConfig> }> {
+  async loadConfig (): Promise<{ config: PijinConfig, path: string }> {
     const path = await this.findConfig()
 
     const configBuffer = await this.fs.readFile(path)
 
     const config: PijinConfig = JSON.parse(configBuffer.toString())
+
+    return {
+      config,
+      path,
+    }
+  }
+
+
+  /**
+   * Same as loadConfig, except it Loads the config file and provides a write
+   * method for writing back to the file once.
+   */
+  async loadConfigMut (): Promise<{ config: PijinConfig, path: string, write: (PijinConfig) => Promise<PijinConfig> }> {
+    const { config, path } = await this.loadConfig()
 
     // This flag is here to see if we have already written to the config file.
     // This can be bypassed if absolutely required by calling the create config
@@ -97,6 +126,7 @@ export class ConfigurationBuilder {
 
     return {
       config,
+      path,
       write: newConfig => {
         if (configIsDirty) throw ConfigurationExpiredException()
         configIsDirty = true
@@ -116,15 +146,3 @@ export class ConfigurationBuilder {
   }
 }
 
-
-const D: {
-  fs: FileSystem,
-  findUp: FindUp,
-} = {
-  fs,
-  findUp,
-}
-
-
-export default ({ fs, findUp }: * = D) =>
-  new ConfigurationBuilder(fs, findUp)

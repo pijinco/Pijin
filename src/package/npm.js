@@ -1,46 +1,43 @@
-'use strict'
+// @flow
 
-const npm = require('npm')
+import npm from 'npm'
+import packageJson from 'package-json'
 
-
-const defaultDependencies = {
-  npm,
+export type NpmPackage = {
+  name: string,
+  version: string,
 }
 
-module.exports = function Npm ({ npm } = defaultDependencies) {
-  /**
-   * Installs an NPM package and returns a promise that resolves on completion
-   * or throws if there are any errors during installation.
-   *
-   * @param {string} packageName - The name of the package to install
-   * @returns {Promise.<string>} A promise that resolves with the name of the package
-   */
-  function install (...args) {
+export default class Npm {
+  npm: *
+  packageJson: *
+
+  static new () {
+    return new Npm(npm, packageJson)
+  }
+
+  constructor (npm: *, packageJson: Function) {
+    this.npm = npm
+    this.packageJson = packageJson
+  }
+
+  install (...args: string[]) {
     return new Promise((resolve, reject) => {
-      npm.install(...args, err =>
+      this.npm.install(...args, err =>
         err ? reject(err) : resolve(args)
       )
     })
   }
 
-
-  /**
-   * load
-   *
-   * @param config
-   * @returns {undefined}
-   */
-  function load (config) {
+  load (config: Object) {
     return new Promise((resolve, reject) => {
-      npm.load(config, err =>
+      this.npm.load(config, err =>
         err ? reject(err) : resolve()
       )
     })
   }
 
-
-  return {
-    install,
-    load,
+  getInfo (packageName: string, version: string): Promise<NpmPackage> {
+    return this.packageJson(packageName, { version })
   }
 }
