@@ -12,7 +12,7 @@
     "flow-typed": "flow-typed",
     "lint": "eslint './src/**/*.js'",
     "lint:fix": "eslint --fix './src/**/*.js'",
-    "test": "ava 'lib/**/__test__/*.test.js'",
+    "test": "npm run -s build && ava 'lib/**/__test__/*.test.js'",
     "watch": "npm run -s build -- --watch"
   },
   "repository": {
