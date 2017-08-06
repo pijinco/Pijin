@@ -6,6 +6,8 @@
 [![build status](https://img.shields.io/travis/pijinco/Pijin.svg)](https://travis-ci.org/pijinco/Pijin)
 [![npm version](https://img.shields.io/npm/v/pijin.svg)](https://www.npmjs.com/package/pijin)
 [![npm download total](https://img.shields.io/npm/dt/pijin.svg)](https://www.npmjs.com/package/pijin)
+[![test coverage](https://img.shields.io/coveralls/pijinco/Pijin.svg)](https://coveralls.io/github/pijinco/Pijin)
+
 
 
 
