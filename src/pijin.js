@@ -64,7 +64,7 @@ export default class Pijin {
     const installablePackageNames = Object.keys(config.dependencies)
       .map(packageName => `${packageName}@${config.dependencies[packageName]}`)
 
-    this.pack.install(installablePackageNames)
+    await this.pack.install(installablePackageNames)
   }
 
   /**

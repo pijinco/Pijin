@@ -15,5 +15,11 @@
       "polyfill": false,
       "regenerator": true
     }]
-  ]
+  ],
+  "ignore": "**/__test__/*.js",
+  "env": {
+    "development": {
+      "sourceMaps": "inline"
+    }
+  }
 }

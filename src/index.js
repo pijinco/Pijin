@@ -15,4 +15,3 @@ const req = {}
 
 exp(req)
 
-console.log(req)

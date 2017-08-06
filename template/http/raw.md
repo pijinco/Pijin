@@ -1,17 +1,8 @@
 ## Test something about the API
 
-### Test ES5
-
-```javascript
-import _ from 'lodash'
-
-export default (req) => {
-  _.set(req, 'test.some', 5)
-}
-```
-
-
 ### Settings
+
+[pijin]: settings
 
 ```yaml
 method: POST
@@ -26,7 +17,6 @@ authorization:
 
 body: raw
 ```
-
 
 ### Body [optional]
 
