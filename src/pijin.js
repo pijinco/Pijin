@@ -8,8 +8,18 @@ const {
   FileExistsException,
 } = require('./exceptions')
 
+
 const configFileName = 'pijin.json'
 const workDirName = 'pijin'
+
+
+export function createInstallablePackageName ([name, version]: [string, mixed]) {
+  if (typeof version !== 'string') {
+    version = 'latest'
+  }
+
+  return `${name}@${version}`
+}
 
 
 type Dependencies = {
@@ -19,7 +29,6 @@ type Dependencies = {
     resolve: (...string[]) => string,
   },
 }
-
 
 export default class Pijin {
   conf: Conf
@@ -61,8 +70,8 @@ export default class Pijin {
 
 
   async run (config: PijinConfig) {
-    const installablePackageNames = Object.keys(config.dependencies)
-      .map(packageName => `${packageName}@${config.dependencies[packageName]}`)
+    const installablePackageNames = Object.entries(config.dependencies)
+      .map(createInstallablePackageName)
 
     await this.pack.install(installablePackageNames)
   }

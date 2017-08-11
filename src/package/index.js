@@ -2,28 +2,44 @@
 
 import Npm from './npm'
 
-const npmConfig = { loglevel: 'silent' }
+import {
+  InvalidArgumentException,
+} from '../exceptions'
 
-const verRegex = new RegExp('^([\\w-]+)(?:@(.+))?$')
+const npmConfig = { loglevel: 'silent' }
+const semVerRegex = new RegExp('^([\\w-]+)(?:@(.+))?$')
+
+
+export function parseVersion (packageName: string): { name: string, version: string } {
+  if (!semVerRegex.test(packageName)) {
+    throw InvalidArgumentException({ packageName })
+  }
+
+  const [, name, version = 'latest'] = packageName.match(semVerRegex) || []
+
+  return {
+    name,
+    version,
+  }
+}
+
+
+type Dependencies = {
+  npm: Npm,
+}
 
 export default class PackageManager {
-  npm: *
+  npm: Npm
 
-  static new () {
-    return new PackageManager(Npm.new())
+  static new (dependencies?: Dependencies): PackageManager {
+    return new PackageManager({
+      npm: Npm.new(),
+      ...dependencies,
+    })
   }
 
-  constructor (npm: Npm) {
+  constructor ({ npm }: Dependencies) {
     this.npm = npm
-  }
-
-  parseVersion (packageName: string) {
-    const [, name, version = 'latest'] = packageName.match(verRegex) || []
-
-    return {
-      name,
-      version,
-    }
   }
 
   async install (packages: string[]) {
@@ -31,9 +47,8 @@ export default class PackageManager {
       await this.npm.load(npmConfig)
 
       const packageDetails = await Promise.all(
-        packages
-          .map(packageName => this.parseVersion(packageName))
-          .map(({ name, version }) => this.npm.getInfo(name, version))
+        packages.map(parseVersion)
+          .map(({ name, version }) => this.npm.getRemoteInfo(name, version))
       )
 
       await this.npm.install(...packageDetails.map(x => x.name))

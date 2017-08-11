@@ -37,7 +37,7 @@ export default class Npm {
     })
   }
 
-  getInfo (packageName: string, version: string): Promise<NpmPackage> {
+  getRemoteInfo (packageName: string, version: string): Promise<NpmPackage> {
     return this.packageJson(packageName, { version })
   }
 }

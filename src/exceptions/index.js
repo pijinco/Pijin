@@ -43,3 +43,18 @@ export const FileExistsException = throwable(
   }
 )
 
+
+/**
+ * InvalidArgumentException
+ *
+ * @param fileIdentifier
+ * @returns {undefined}
+ */
+export const InvalidArgumentException = throwable(
+  function InvalidArgumentException (arg) {
+    return {
+      message: `Argument ${arg} is invalid.`,
+    }
+  }
+)
+

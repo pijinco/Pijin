@@ -12,7 +12,7 @@ import {
 
 
 export type PijinConfig = {
-  dependencies: Object,
+  dependencies: { [string]: string },
   workdir?: string,
 }
 
@@ -25,6 +25,11 @@ const defaultConfig: PijinConfig = {
 type Dependencies = {
   fs: FileSystem,
   findUp: typeof findUp,
+}
+
+
+function appendDependency (dependencies, { name, version }: NpmPackage) {
+  return Object.assign({}, dependencies, { [name]: version })
 }
 
 
@@ -52,9 +57,7 @@ export default class ConfigurationBuilder {
   async updateDependencies (dependencies: NpmPackage[]) {
     // Load a list of dependencies similar to how npm does it by default with
     // the caret to only lock the major
-    const deps = dependencies
-      .map(({ name, version }) => ({ [name]: `${version}` }))
-      .reduce((acc, next) => Object.assign(acc, next))
+    const deps = dependencies.reduce(appendDependency, {})
 
     // Load the configuration and write
     const { config, write } = await this.loadConfigMut()

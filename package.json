@@ -8,12 +8,14 @@
   },
   "scripts": {
     "build": "rimraf lib && babel src --out-dir lib --source-maps inline",
+    "build:watch": "npm run -s build -- --watch",
     "flow": "flow",
+    "flow:watch": "nodemon --exec 'npm run flow; exit 0' --ignore ./node_modules --ignore ./lib --watch *.js --watch .flowconfig",
     "flow-typed": "flow-typed",
     "lint": "eslint './src/**/*.js'",
     "lint:fix": "eslint --fix './src/**/*.js'",
     "test": "nyc ava",
-    "watch": "npm run -s build -- --watch",
+    "test:watch": "nyc ava --watch",
     "report:html": "nyc report --reporter=html",
     "report:coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
@@ -57,7 +59,7 @@
     "babel-preset-flow": "^6.23.0",
     "babel-register": "^6.24.1",
     "coveralls": "^2.13.1",
-    "eslint": "^4.2.0",
+    "eslint": "^4.4.1",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-flowtype": "^2.35.0",
     "eslint-plugin-import": "^2.7.0",
@@ -67,6 +69,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.51.1",
     "flow-typed": "^2.1.5",
+    "nodemon": "^1.11.0",
     "nyc": "^11.1.0",
     "rimraf": "^2.6.1",
     "sinon": "^2.3.8"
