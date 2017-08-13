@@ -34,11 +34,20 @@ yargs
   .command({
     command: 'run',
     desc: 'Run the API tests',
-    handler: () => conf.loadConfig()
-      .then(({ config }) => pijin.run(config))
+    handler: () => pijin.install()
       .catch(console.error),
   })
 
+/**
+ * Run the tests
+ */
+yargs
+  .command({
+    command: 'run',
+    desc: 'Run the API tests',
+    handler: () => pijin.run(process.cwd())
+      .catch(console.error),
+  })
 
 /**
  * Initialize Pijin in the current directory.

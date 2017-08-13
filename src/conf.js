@@ -1,6 +1,6 @@
 // @flow
 
-import findUp, { type FindUp } from 'find-up'
+import findUp from 'find-up'
 import fs, { type FileSystem } from './io/file'
 import { type NpmPackage } from './package/npm'
 
@@ -35,7 +35,7 @@ function appendDependency (dependencies, { name, version }: NpmPackage) {
 
 export default class ConfigurationBuilder {
   fs: FileSystem
-  findUp: FindUp
+  findUp: typeof findUp
 
   static new (dependencies?: Dependencies) {
     return new ConfigurationBuilder({

@@ -1,16 +1,22 @@
 // @flow
 
-import path from 'path'
-import Conf, { type PijinConfig } from './conf'
+import Conf from './conf'
 import PackageManager from './package'
+import path from 'path'
+import TestRunner from './runner/test-runner'
 
-const {
-  FileExistsException,
-} = require('./exceptions')
-
+import { FileExistsException } from './exceptions'
 
 const configFileName = 'pijin.json'
 const workDirName = 'pijin'
+
+
+const requiredDependencies = {
+  'babel-plugin-transform-object-rest-spread': '6.23.0',
+  'babel-plugin-transform-runtime': '6.23.0',
+  'babel-preset-env': '1.6.0',
+  'babel-register': '6.24.1',
+}
 
 
 export function createInstallablePackageName ([name, version]: [string, mixed]) {
@@ -28,12 +34,15 @@ type Dependencies = {
   path: {
     resolve: (...string[]) => string,
   },
+  testRunner: TestRunner,
 }
+
 
 export default class Pijin {
   conf: Conf
   pack: PackageManager
   path: { resolve: (...string[]) => string }
+  testRunner: TestRunner
 
 
   static new (dependencies?: Dependencies): Pijin {
@@ -41,15 +50,17 @@ export default class Pijin {
       conf: Conf.new(),
       pack: PackageManager.new(),
       path,
+      testRunner: TestRunner.new(),
       ...dependencies,
     })
   }
 
 
-  constructor ({ conf, pack, path }: Dependencies) {
+  constructor ({ conf, pack, path, testRunner }: Dependencies) {
     this.conf = conf
     this.pack = pack
     this.path = path
+    this.testRunner = testRunner
   }
 
   /**
@@ -69,11 +80,32 @@ export default class Pijin {
   }
 
 
-  async run (config: PijinConfig) {
-    const installablePackageNames = Object.entries(config.dependencies)
-      .map(createInstallablePackageName)
+  async install () {
+    try {
+      const { config } = await this.conf.loadConfig()
 
-    await this.pack.install(installablePackageNames)
+      const installablePackageNames = Object
+        .entries({ ...requiredDependencies, ...config.dependencies })
+        .map(createInstallablePackageName)
+
+      await this.pack.install(installablePackageNames)
+    } catch (error) {
+      console.error('Unable to install dependencies', error)
+    }
+  }
+
+
+  async run (dir: string) {
+    try {
+      console.log('Running tests...')
+
+      const workDirPath = path.resolve(dir, workDirName)
+      await this.testRunner.load(workDirPath)
+    } catch (error) {
+      // TODO error handling strategies for if tests fail?
+      console.error('Something went wrong')
+      process.exit(1)
+    }
   }
 
   /**

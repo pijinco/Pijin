@@ -1,26 +1,36 @@
 // @flow
 
-import transpiler from './transpilers/babel'
+import BabelTranspiler from './transpilers/babel'
 import { type Transpiler } from './transpilers/interface'
-import evil, { type Evil } from './evil'
+import Evil from './evil'
 
+type Dependencies = {
+  evil: Evil,
+  transpiler: Transpiler,
+}
 
-export class Sandbox {
-  evil: *
-  transpiler: *
+export default class Sandbox {
+  evil: Evil
+  transpiler: Transpiler
 
-  constructor (evil: Evil, transpiler: Transpiler) {
+  static new (dependencies?: Dependencies) {
+    return new Sandbox({
+      evil: Evil.new(),
+      transpiler: BabelTranspiler.new(),
+      ...dependencies,
+    })
+  }
+
+  constructor ({ evil, transpiler }: Dependencies) {
     this.evil = evil
     this.transpiler = transpiler
   }
 
-  run (src: string, args: mixed[]) {
+  run (src: string, context?: Object = {}) {
     const code = this.transpiler.transpile(src)
 
-    const fn = this.evil.evalModule(code)
+    const result = this.evil.evalModule(code, context, process.cwd())
 
-    return fn(...args)
+    return result
   }
 }
-
-export default new Sandbox(evil, transpiler)

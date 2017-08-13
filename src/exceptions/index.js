@@ -58,3 +58,18 @@ export const InvalidArgumentException = throwable(
   }
 )
 
+
+/**
+ * InvalidMarkdownException
+ *
+ * @param fileIdentifier
+ * @returns {undefined}
+ */
+export const InvalidMarkdownException = throwable(
+  function InvalidMarkdownException (reason) {
+    return {
+      message: `Invalid Markdown Format: ${reason}`,
+    }
+  }
+)
+

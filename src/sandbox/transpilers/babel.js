@@ -4,15 +4,25 @@ import { transform, type BabelResult } from 'babel-core'
 
 import { type Transpiler } from './interface'
 
+type Dependencies = {
+  transform: (string, options?: Object) => BabelResult,
+}
 
-export class BabelTranspiler implements Transpiler {
+export default class BabelTranspiler implements Transpiler {
   transform: *
 
-  constructor (transform: (string, options?: Object) => BabelResult) {
+  static new (dependencies?: Dependencies) {
+    return new BabelTranspiler({
+      transform: transform,
+      ...dependencies,
+    })
+  }
+
+  constructor ({ transform }: Dependencies) {
     this.transform = transform
   }
 
-  transpile (src: string): string {
+  transpile (src: string, contextPath: string = '/Users/tom/Code/pijinco/Pijin'): string {
     const { code } = this.transform(src, {
       presets: [
         ['env', {
@@ -20,11 +30,13 @@ export class BabelTranspiler implements Transpiler {
         }],
       ],
       babelrc: false,
+      generatorOpts: {
+        dirname: contextPath,
+      },
     })
+
 
     return code
   }
 }
 
-
-export default new BabelTranspiler(transform)

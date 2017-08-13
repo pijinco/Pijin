@@ -8,6 +8,7 @@ export type FileSystem = {
   writeFile: (string, string | Buffer) => Promise<string>,
   readFile: (string) => Promise<Buffer>,
   mkdir: (string) => Promise<string>,
+  readdir: (string) => Promise<string[]>,
 }
 
 
@@ -48,6 +49,17 @@ export function readFile (path: string) {
 }
 
 
+export function readdir (path: string) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(path, (err, content) => {
+      if (err) reject(err)
+
+      resolve(content)
+    })
+  })
+}
+
+
 /**
  * Creates a new directory at the specified path and returns a promise.
  * Resolves the promise with the value `{ path }`.
@@ -70,4 +82,5 @@ export default ({
   mkdir,
   readFile,
   writeFile,
+  readdir,
 }: FileSystem)
