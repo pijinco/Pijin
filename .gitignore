@@ -1,5 +1,5 @@
 lib
-flow-typed
+flow-typed/npm
 node_modules
 coverage
 .nyc_output
