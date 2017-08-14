@@ -75,6 +75,7 @@ export default class Pijin {
         console.log('Pijin is already initialized :)')
       } else {
         console.error('There was a problem doing the thing :(')
+        process.exit(1)
       }
     }
   }
@@ -91,6 +92,7 @@ export default class Pijin {
       await this.pack.install(installablePackageNames)
     } catch (error) {
       console.error('Unable to install dependencies', error)
+      process.exit(1)
     }
   }
 
@@ -103,7 +105,7 @@ export default class Pijin {
       await this.testRunner.load(workDirPath)
     } catch (error) {
       // TODO error handling strategies for if tests fail?
-      console.error('Something went wrong')
+      console.error('Something went wrong', error)
       process.exit(1)
     }
   }
