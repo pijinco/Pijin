@@ -21,17 +21,14 @@ const defaultConfig: PijinConfig = {
   dependencies: {},
 }
 
-
 type Dependencies = {
   fs: FileSystem,
   findUp: typeof findUp,
 }
 
-
 function appendDependency (dependencies, { name, version }: NpmPackage) {
   return Object.assign({}, dependencies, { [name]: version })
 }
-
 
 export default class ConfigurationBuilder {
   fs: FileSystem
